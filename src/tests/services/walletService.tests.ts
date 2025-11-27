@@ -158,14 +158,16 @@ describe('WalletService Unit Tests', () => {
         commit: jest.fn().mockResolvedValue(undefined),
         rollback: jest.fn().mockResolvedValue(undefined),
       };
-      (db.transaction as jest.Mock).mockImplementation((callback: any) => callback(mockTrx));
 
       (WalletModel.findByUserId as jest.Mock)
         .mockResolvedValueOnce(mockSenderWallet)
         .mockResolvedValueOnce(mockRecipientWallet);
       (UserModel.findByEmail as jest.Mock).mockResolvedValue(mockRecipient);
       (db.transaction as jest.Mock).mockResolvedValue(mockTrx);
-      (WalletModel.getBalanceForUpdate as jest.Mock).mockResolvedValueOnce(1000);
+
+      (WalletModel.getBalanceForUpdate as jest.Mock)
+        .mockResolvedValueOnce(1000)
+        .mockResolvedValueOnce(0);
 
       await expect(
         WalletService.transferFunds('user-sender', {

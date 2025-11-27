@@ -1,20 +1,8 @@
 // src/models/wallet.model.ts
 import db from '../config/database';
-import { IWallet } from '../types';
+import { IWallet, CreateWalletDto } from '../types';
 import { Knex } from 'knex';
 import { v4 as uuidv4 } from 'uuid';
-
-interface CreateWalletDto {
-  user_id: string;
-  balance?: number;
-  currency?: string;
-}
-
-interface UpdateBalanceDto {
-  amount: number;         
-  description?: string;
-  reference?: string;
-}
 
 class WalletModel {
   private tableName = 'wallets';
@@ -52,13 +40,7 @@ class WalletModel {
     return await connection(this.tableName).where({ user_id: userId }).first();
   }
 
-  // Atomically update balance (credit or debit)
-  // Use this inside a Knex transaction for money safety!
-  async updateBalance(
-    walletId: string,
-    newBalance: number,
-    trx?: Knex.Transaction
-  ): Promise<void> {
+  async updateBalance(walletId: string, newBalance: number, trx?: Knex.Transaction): Promise<void> {
     const connection = trx || db;
     
     const result = await connection(this.tableName)
@@ -73,79 +55,29 @@ class WalletModel {
     }
   }
 
-  async incrementBalance(
-    walletId: string,
-    amount: number,
-    trx?: Knex.Transaction
-  ): Promise<void> {
-    const connection = trx || db;
-    await connection(this.tableName)
-      .where({ id: walletId })
-      .increment('balance', amount)
-      .update({ updated_at: db.fn.now() });
-  }
-
-  async decrementBalance(
-    walletId: string,
-    amount: number,
-    trx?: Knex.Transaction
-  ): Promise<void> {
-    const connection = trx || db;
-    await connection(this.tableName)
-      .where({ id: walletId })
-      .decrement('balance', amount)
-      .update({ updated_at: db.fn.now() });
-  }
-
   async getBalanceForUpdate(
     walletId: string,
-    trx: Knex.Transaction
-  ): Promise<number> {
-    const wallet = await trx(this.tableName)
-      .where({ id: walletId })
-      .forUpdate()
-      .first();
-    
-    return wallet ? parseFloat(wallet.balance) : 0;
-  }
-
-  async existsForUser(userId: string, trx?: Knex.Transaction): Promise<boolean> {
-    const connection = trx || db;
-    const wallet = await connection(this.tableName).where({ user_id: userId }).first();
-    return !!wallet;
-  }
-
-  async getBalance(walletId: string, trx: Knex.Transaction
-    ): Promise<number> {
-    const row = await trx(this.tableName)
-        .forUpdate()                    // Locks the row until transaction ends
-        .select('balance')
-        .where({ id: walletId })
-        .first();
-
-    if (!row) {
-        throw new Error('Wallet not found');
-    }
-
-    return Number(row.balance);
-    }
-
-    async hasSufficientBalance(
-    walletId: string,
-    amount: number,
     trx?: Knex.Transaction
-  ): Promise<boolean> {
-    const connection = trx || db;
+  ): Promise<number> {
+    const connection: any = trx || db;
 
-    const wallet = await connection(this.tableName)
-      .where({ id: walletId })
-      .first();
-
-    if (!wallet) {
-      return false;
+    // Support two shapes:
+    // - callable connection: connection(tableName).where(...)
+    // - query-like object (used in tests/mocks): connection.where(...)
+    let wallet: any;
+    if (typeof connection === 'function') {
+      wallet = await connection(this.tableName)
+        .where({ id: walletId })
+        .forUpdate()
+        .first();
+    } else {
+      wallet = await connection
+        .where({ id: walletId })
+        .forUpdate()
+        .first();
     }
 
-    return parseFloat(wallet.balance) >= amount;
+    return wallet ? parseFloat(wallet.balance) : 0;
   }
 }
 

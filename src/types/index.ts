@@ -42,11 +42,30 @@ export interface CreateUserDto {
   first_name: string;
   last_name: string;
   phone: string;
+  is_blacklisted?: boolean;
 }
 
 export interface LoginDto {
   email: string;
   password: string;
+}
+
+export interface CreateWalletDto {
+  user_id: string;
+  balance?: number;
+  currency?: string;
+}
+
+export interface CreateTransactionDto {
+  wallet_id: string;
+  type: 'credit' | 'debit';
+  category: 'funding' | 'transfer' | 'withdrawal';
+  amount: number;
+  balance_before: number;
+  balance_after: number;
+  description?: string;
+  recipient_wallet_id?: string;
+  metadata?: any;
 }
 
 export interface FundWalletDto {

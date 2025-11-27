@@ -1,19 +1,7 @@
 import db from '../config/database';
-import { ITransaction } from '../types';
+import { ITransaction, CreateTransactionDto } from '../types';
 import { Knex } from 'knex';
 import { v4 as uuidv4 } from 'uuid';
-
-interface CreateTransactionDto {
-  wallet_id: string;
-  type: 'credit' | 'debit';
-  category: 'funding' | 'transfer' | 'withdrawal';
-  amount: number;
-  balance_before: number;
-  balance_after: number;
-  description?: string;
-  recipient_wallet_id?: string;
-  metadata?: any;
-}
 
 class TransactionModel {
   private tableName = 'transactions';
@@ -23,7 +11,7 @@ class TransactionModel {
     trx?: Knex.Transaction
   ): Promise<ITransaction> {
     const connection = trx || db;
-
+    //using uuid for id generation because of type errors from typescript
     const id = uuidv4();
     
     const reference = `TXN-${uuidv4()}`;
@@ -55,11 +43,7 @@ class TransactionModel {
     return transaction || null;
   }
 
-  async findByWalletId(
-    walletId: string,
-    limit = 50,
-    offset = 0
-  ): Promise<ITransaction[]> {
+  async findByWalletId(walletId: string, limit = 50, offset = 0): Promise<ITransaction[]> {
     return db(this.tableName)
       .where({ wallet_id: walletId })
       .orderBy('created_at', 'desc')
@@ -67,20 +51,14 @@ class TransactionModel {
       .offset(offset);
   }
 
-  async updateStatus(
-    transactionId: string,
-    status: 'pending' | 'success' | 'failed',
-    trx?: Knex.Transaction
-  ): Promise<void> {
+  async updateStatus(transactionId: string, status: 'pending' | 'success' | 'failed', trx?: Knex.Transaction ): Promise<void> {
     const connection = trx || db;
     await connection(this.tableName)
       .where({ id: transactionId })
       .update({ status, updated_at: db.fn.now() });
   }
 
-  async getTransactionHistory(
-    walletId: string,
-    filters?: {
+  async getTransactionHistory(walletId: string, filters?: {
       type?: 'credit' | 'debit';
       category?: 'funding' | 'transfer' | 'withdrawal';
       startDate?: Date;

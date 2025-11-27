@@ -172,44 +172,4 @@ describe('WalletModel Unit Tests', () => {
       expect(result).toBe(0);
     });
   });
-
-  describe('hasSufficientBalance', () => {
-    it('should return true if sufficient', async () => {
-      mockDb('wallets').where.mockReturnThis();
-      mockDb('wallets').first.mockResolvedValue({ balance: '10000.00' });
-
-      const result = await WalletModel.hasSufficientBalance('wallet-123', 5000);
-      expect(result).toBe(true);
-    });
-
-    it('should return false if insufficient or not found', async () => {
-      mockDb('wallets').where.mockReturnThis();
-      mockDb('wallets').first.mockResolvedValue({ balance: '1000.00' });
-
-      const result = await WalletModel.hasSufficientBalance('wallet-123', 5000);
-      expect(result).toBe(false);
-
-      mockDb('wallets').first.mockResolvedValue(null);
-      const result2 = await WalletModel.hasSufficientBalance('bad', 100);
-      expect(result2).toBe(false);
-    });
-  });
-
-  describe('existsForUser', () => {
-    it('should return true if wallet exists', async () => {
-      mockDb('wallets').where.mockReturnThis();
-      mockDb('wallets').first.mockResolvedValue({ id: 'wallet-123' });
-
-      const result = await WalletModel.existsForUser('user-123');
-      expect(result).toBe(true);
-    });
-
-    it('should return false if not exists', async () => {
-      mockDb('wallets').where.mockReturnThis();
-      mockDb('wallets').first.mockResolvedValue(null);
-
-      const result = await WalletModel.existsForUser('user-999');
-      expect(result).toBe(false);
-    });
-  });
 });

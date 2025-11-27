@@ -10,6 +10,9 @@ module.exports = {
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
       database: process.env.DB_NAME || 'wallet_service',
+      ssl: {
+        rejectUnauthorized: true 
+      }
     },
     pool: {
       min: 2,
@@ -29,6 +32,9 @@ module.exports = {
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
       database: `${process.env.DB_NAME}_test` || 'wallet_service_test',
+      ssl: {
+        rejectUnauthorized: true 
+      }
     },
     pool: {
       min: 1,

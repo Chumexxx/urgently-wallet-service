@@ -4,12 +4,8 @@ import WalletService from '../services/walletService';
 import { ApiResponse } from '../utils/apiResponse';
 import { FundWalletDto, TransferDto, WithdrawDto } from '../types';
 
+/*The core functionality of this web service is the wallet. This controller communicates to the services which communicate with the model and the database to create transaction and perform other functions in the user's wallet*/
 class WalletController {
-  /**
-   * @desc    Get wallet balance
-   * @route   GET /api/v1/wallet/balance
-   * @access  Private
-   */
   async getBalance(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.userId;
@@ -23,49 +19,34 @@ class WalletController {
     }
   }
 
-  /**
-   * @desc    Get complete wallet information
-   * @route   GET /api/v1/wallet
-   * @access  Private
-   */
   async getWalletInfo(req: AuthRequest, res: Response, next: NextFunction) {
     try {
         const userId = req.user!.userId;
 
-        // Run both queries in parallel for speed
+        // We're returning both balance and recent transactions in one call for the user. This is common with most wallets
         const [balanceData, recentTransactions] = await Promise.all([
         WalletService.getWalletBalance(userId),
         WalletService.getTransactionHistory(userId, {
-            limit: 5,
-            // Optional: you can make this configurable via query param later
-            // e.g., ?recent=10 or ?include=pending
-        }),
+            limit: 5, // Deliberately limiting to 5 recent transactions
+          }),
         ]);
 
         return res.status(200).json(
         ApiResponse.success(
             {
-            // Spread whatever your getWalletBalance returns
-            // Usually: { balance, wallet_id, currency, etc. }
+            // we're spreading what the get wallet returns to keep the structure consistent
             ...balanceData,
-
-            // Clean name + always include count
             recent_transactions: recentTransactions,
             recent_transactions_count: recentTransactions.length,
             },
             'Wallet information retrieved successfully'
-        )
+          )
         );
-    } catch (error) {
-        next(error);
-    }
-    }
-
-  /**
-   * @desc    Fund wallet
-   * @route   POST /api/v1/wallet/fund
-   * @access  Private
-   */
+      } catch (error) {
+          next(error);
+      }
+  }
+    
   async fundWallet(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.userId;
@@ -80,11 +61,6 @@ class WalletController {
     }
   }
 
-  /**
-   * @desc    Transfer funds to another user
-   * @route   POST /api/v1/wallet/transfer
-   * @access  Private
-   */
   async transfer(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.userId;
@@ -99,11 +75,6 @@ class WalletController {
     }
   }
 
-  /**
-   * @desc    Withdraw funds
-   * @route   POST /api/v1/wallet/withdraw
-   * @access  Private
-   */
   async withdraw(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user!.userId;
@@ -118,35 +89,18 @@ class WalletController {
     }
   }
 
-  /**
-   * @desc    Get transaction history
-   * @route   GET /api/v1/wallet/transactions
-   * @access  Private
-   */
   async getTransactions(req: AuthRequest, res: Response, next: NextFunction) {
     try {
         const userId = req.user!.userId;
 
-        // Parse and sanitize query parameters
         const limit = req.query.limit ? Math.min(parseInt(req.query.limit as string, 10), 100) : 50;
-        // ↑ Cap at 100 to prevent abuse
 
         const type = req.query.type as 'credit' | 'debit' | undefined;
         const category = req.query.category as 'funding' | 'transfer' | 'withdrawal' | undefined;
         const startDate = req.query.startDate as string | undefined;
         const endDate = req.query.endDate as string | undefined;
 
-        // Optional: Add pagination later
-        // const page = parseInt(req.query.page as string) || 1;
-        // const offset = (page - 1) * limit;
-
-        const transactions = await WalletService.getTransactionHistory(userId, {
-        limit,
-        type,
-        category,
-        startDate,
-        endDate,
-        });
+        const transactions = await WalletService.getTransactionHistory(userId, {limit, type, category, startDate, endDate,}); //query parameters for filtering
 
         return res.status(200).json(
         ApiResponse.success(
@@ -156,12 +110,12 @@ class WalletController {
             filters: { type, category, startDate, endDate, limit },
             },
             'Transaction history retrieved successfully'
-        )
+          )
         );
     } catch (error) {
-        next(error);
+      next(error);
     }
-    }
+  }
 
 }
 

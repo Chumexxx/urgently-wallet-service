@@ -28,10 +28,8 @@ app.use((req, res, next) => {
 // API Routes
 app.use('/api/v1', apiRoutes);
 
-// 404 Handler
 app.use(notFoundHandler);
 
-// Error Handler
 app.use(errorHandler);
 
 export default app;

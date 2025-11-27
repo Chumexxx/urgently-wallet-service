@@ -6,9 +6,6 @@ import { ApiError } from '../utils/apiError';
 import db from '../config/database';
 
 class WalletService {
-  /**
-   * Get wallet balance
-   */
   async getWalletBalance(userId: string) {
     const wallet = await WalletModel.findByUserId(userId);
 
@@ -23,22 +20,17 @@ class WalletService {
     };
   }
 
-  /**
-   * Fund wallet
-   */
   async fundWallet(userId: string, data: FundWalletDto) {
-    // Validate amount
+
     if (data.amount <= 0) {
       throw ApiError.badRequest('Amount must be greater than zero');
     }
 
-    // Find wallet
     const wallet = await WalletModel.findByUserId(userId);
     if (!wallet) {
       throw ApiError.notFound('Wallet not found');
     }
 
-    // Start transaction
     const trx = await db.transaction();
 
     try {
@@ -46,10 +38,8 @@ class WalletService {
       const currentBalance = await WalletModel.getBalanceForUpdate(wallet.id, trx);
       const newBalance = currentBalance + data.amount;
 
-      // Update wallet balance
       await WalletModel.updateBalance(wallet.id, newBalance, trx);
 
-      // Create transaction record
       const transaction = await TransactionModel.create(
         {
           wallet_id: wallet.id,
@@ -63,7 +53,6 @@ class WalletService {
         trx
       );
 
-      // Commit transaction
       await trx.commit();
 
       return {
@@ -77,29 +66,23 @@ class WalletService {
         },
       };
     } catch (error) {
-      // Rollback on error
       await trx.rollback();
       console.error('Fund wallet error:', error);
       throw error;
     }
   }
 
-  /**
-   * Transfer funds to another user
-   */
+  // Function to allow users transfer funds to another user's wallet. Since email is unique, we use it to identify recipient
   async transferFunds(userId: string, data: TransferDto) {
-    // Validate amount
     if (data.amount <= 0) {
       throw ApiError.badRequest('Amount must be greater than zero');
     }
 
-    // Get sender's wallet
     const senderWallet = await WalletModel.findByUserId(userId);
     if (!senderWallet) {
       throw ApiError.notFound('Sender wallet not found');
     }
 
-    // Get recipient by email
     const recipient = await UserModel.findByEmail(data.recipient_email);
     if (!recipient) {
       throw ApiError.notFound('Recipient not found');
@@ -110,21 +93,17 @@ class WalletService {
       throw ApiError.badRequest('Cannot transfer to yourself');
     }
 
-    // Get recipient's wallet
     const recipientWallet = await WalletModel.findByUserId(recipient.id);
     if (!recipientWallet) {
       throw ApiError.notFound('Recipient wallet not found');
     }
 
-    // Start transaction
     const trx = await db.transaction();
 
     try {
-      // Lock both wallets for update
       const senderBalance = await WalletModel.getBalanceForUpdate(senderWallet.id, trx);
       const recipientBalance = await WalletModel.getBalanceForUpdate(recipientWallet.id, trx);
 
-      // Check sufficient balance
       if (senderBalance < data.amount) {
         throw ApiError.badRequest('Insufficient balance');
       }
@@ -132,13 +111,10 @@ class WalletService {
       const newSenderBalance = senderBalance - data.amount;
       const newRecipientBalance = recipientBalance + data.amount;
 
-      // Update sender's wallet
       await WalletModel.updateBalance(senderWallet.id, newSenderBalance, trx);
 
-      // Update recipient's wallet
       await WalletModel.updateBalance(recipientWallet.id, newRecipientBalance, trx);
 
-      // Create debit transaction for sender
       const debitTransaction = await TransactionModel.create(
         {
           wallet_id: senderWallet.id,
@@ -154,7 +130,6 @@ class WalletService {
         trx
       );
 
-      // Create credit transaction for recipient
       await TransactionModel.create(
         {
           wallet_id: recipientWallet.id,
@@ -169,7 +144,6 @@ class WalletService {
         trx
       );
 
-      // Commit transaction
       await trx.commit();
 
       return {
@@ -185,46 +159,36 @@ class WalletService {
         },
       };
     } catch (error) {
-      // Rollback on error
       await trx.rollback();
       console.error('Transfer error:', error);
       throw error;
     }
   }
-
-  /**
-   * Withdraw funds
-   */
+  // Withdraw funds from wallet
   async withdrawFunds(userId: string, data: WithdrawDto) {
-    // Validate amount
     if (data.amount <= 0) {
       throw ApiError.badRequest('Amount must be greater than zero');
     }
 
-    // Find wallet
     const wallet = await WalletModel.findByUserId(userId);
     if (!wallet) {
       throw ApiError.notFound('Wallet not found');
     }
 
-    // Start transaction
     const trx = await db.transaction();
 
     try {
-      // Lock wallet for update
       const currentBalance = await WalletModel.getBalanceForUpdate(wallet.id, trx);
 
-      // Check sufficient balance
       if (currentBalance < data.amount) {
         throw ApiError.badRequest('Insufficient balance');
       }
 
       const newBalance = currentBalance - data.amount;
 
-      // Update wallet balance
+
       await WalletModel.updateBalance(wallet.id, newBalance, trx);
 
-      // Create transaction record
       const transaction = await TransactionModel.create(
         {
           wallet_id: wallet.id,
@@ -259,17 +223,14 @@ class WalletService {
     }
   }
 
-  /**
-   * Get transaction history
-   */
   async getTransactionHistory(
   userId: string,
   queryParams: {
     limit?: number;
     type?: 'credit' | 'debit';
     category?: 'funding' | 'transfer' | 'withdrawal';
-    startDate?: string;  // ISO string
-    endDate?: string;    // ISO string
+    startDate?: string;  
+    endDate?: string;    
   } = {}
 ) {
   const wallet = await WalletModel.findByUserId(userId);
@@ -285,13 +246,12 @@ class WalletService {
   if (startDate) filters.startDate = new Date(startDate);
   if (endDate) {
     const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999); // Include full day
+    end.setHours(23, 59, 59, 999);
     filters.endDate = end;
   }
 
   const transactions = await TransactionModel.getTransactionHistory(wallet.id, filters);
 
-  // Apply limit after filtering (or better: add pagination later)
   return transactions
     .slice(0, limit)
     .map((txn) => ({
@@ -306,7 +266,7 @@ class WalletService {
       status: txn.status,
       created_at: txn.created_at,
     }));
-}
+  }
 }
 
 export default new WalletService();

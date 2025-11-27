@@ -10,7 +10,7 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  // If it's our custom ApiError
+ 
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
       status: 'error',
@@ -20,7 +20,6 @@ export const errorHandler = (
     });
   }
 
-  // Handle specific error types
   if (err.name === 'ValidationError') {
     return res.status(400).json({
       status: 'error',
@@ -38,7 +37,6 @@ export const errorHandler = (
     });
   }
 
-  // Database errors
   if (err.name === 'ER_DUP_ENTRY' || (err as any).code === 'ER_DUP_ENTRY') {
     return res.status(409).json({
       status: 'error',
@@ -48,7 +46,7 @@ export const errorHandler = (
   }
 
   // Log unexpected errors
-  console.error('❌ Unexpected Error:', {
+  console.error('Unexpected Error:', {
     name: err.name,
     message: err.message,
     stack: err.stack,
@@ -67,9 +65,6 @@ export const errorHandler = (
   });
 };
 
-/**
- * 404 Not Found handler
- */
 export const notFoundHandler = (req: Request, res: Response) => {
   res.status(404).json({
     status: 'error',
@@ -78,9 +73,6 @@ export const notFoundHandler = (req: Request, res: Response) => {
   });
 };
 
-/**
- * Async handler wrapper to catch errors in async route handlers
- */
 export const asyncHandler = (fn: Function) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);

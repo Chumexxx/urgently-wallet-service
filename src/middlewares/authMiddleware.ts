@@ -10,12 +10,9 @@ export interface AuthRequest extends Request {
   };
 }
 
-/**
- * Middleware to authenticate requests using JWT
- */
+//This middleware protects the route to authenticate all requests.  
 export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    // Get token from Authorization header
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -26,26 +23,19 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
       throw ApiError.unauthorized('Invalid authorization format. Use: Bearer <token>');
     }
 
-    // Extract token
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const token = authHeader.substring(7);
 
     if (!token) {
       throw ApiError.unauthorized('No token provided');
     }
 
-    // Verify token
     const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
     
     try {
       const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
 
-      // Attach user info to request object
-      req.user = {
-        userId: decoded.userId,
-        email: decoded.email,
-      };
+      req.user = { userId: decoded.userId, email: decoded.email};
 
-      // Continue to next middleware
       next();
     } catch (jwtError: any) {
       if (jwtError.name === 'TokenExpiredError') {

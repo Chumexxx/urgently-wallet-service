@@ -4,17 +4,13 @@ import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
 import path from 'path';
 
-// Ensure logs directory exists
 const logsDir = path.join(process.cwd(), 'logs');
 mkdir(logsDir, { recursive: true }).catch(console.error);
 
-// Create the logger based on environment
 let logger: pino.Logger;
 
 if (process.env.NODE_ENV !== 'production') {
-  // DEVELOPMENT: Pretty print to console AND log to files
   const streams: pino.StreamEntry[] = [
-    // Pretty console output
     {
       level: 'info',
       stream: pino.transport({
@@ -26,12 +22,10 @@ if (process.env.NODE_ENV !== 'production') {
         },
       }),
     },
-    // Regular JSON to app.log
     {
       level: 'info',
       stream: createWriteStream(path.join(logsDir, 'app.log'), { flags: 'a' }),
     },
-    // Errors to error.log
     {
       level: 'error',
       stream: createWriteStream(path.join(logsDir, 'error.log'), { flags: 'a' }),
@@ -45,7 +39,6 @@ if (process.env.NODE_ENV !== 'production') {
     pino.multistream(streams)
   );
 } else {
-  // PRODUCTION: JSON logs to files only
   const streams: pino.StreamEntry[] = [
     {
       level: 'info',
@@ -73,7 +66,6 @@ if (process.env.NODE_ENV !== 'production') {
   );
 }
 
-// HTTP Logger
 export const httpLogger = pinoHttp({
   logger,
   genReqId: (req) =>

@@ -1,17 +1,10 @@
 import db from '../config/database';
-import { IUser } from '../types';
+import { IUser, CreateUserDto } from '../types';
 import { Knex } from 'knex';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 
-interface CreateUserDto {
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  is_blacklisted?: boolean;
-}
+
 
 class UserModel {
   private tableName = 'users';
@@ -47,15 +40,6 @@ class UserModel {
     return !!user;
   }
 
-  async exists(identifier: string, trx?: Knex.Transaction): Promise<boolean> {
-    const connection = trx || db;
-    const user = await connection(this.tableName)
-      .where('email', identifier)
-      .orWhere('phone', identifier)
-      .first();
-    return !!user;
-  }
-
   async verifyPassword(plainPassword: string, hashedPassword: string
   ): Promise<boolean> {
     return await bcrypt.compare(plainPassword, hashedPassword);
@@ -74,17 +58,6 @@ class UserModel {
   async findByEmail(email: string, trx?: Knex.Transaction): Promise<IUser | null> {
     const connection = trx || db;
     return await connection(this.tableName).where({ email }).first();
-  }
-
-  async updateUser(id: string, data: Partial<CreateUserDto>, trx?: Knex.Transaction
-  ): Promise<void> {
-    const connection = trx || db;
-    await connection(this.tableName)
-      .where({ id })
-      .update({
-        ...data,
-        updated_at: connection.fn.now(),
-      });
   }
 
   async updateBlacklistStatus(userId: string, isBlacklisted: boolean): Promise<void> {

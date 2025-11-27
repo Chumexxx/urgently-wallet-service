@@ -22,9 +22,10 @@ class AuthService {
     ]);
 
     if (emailExists || phoneExists) {
-        throw ApiError.conflict('User with this email or phone already exists');
+      throw ApiError.conflict('User with this email or phone already exists');
     }
 
+    //this is where we start to check karma blacklist
     console.log('🔍 Checking Karma blacklist for new user...');
 
     try {
@@ -42,43 +43,37 @@ class AuthService {
           );
         }
 
-        console.log('✅ User passed Karma blacklist check');
+        console.log('User passed Karma blacklist check');
         } catch (error) {
-        // If it's already an ApiError (like our forbidden error), re-throw it
         if (error instanceof ApiError) {
             throw error;
         }
 
-        // For other errors (API failures), log and decide strategy
-        console.error('⚠️  Karma API check failed:', error);
-        // Current: Fail-secure - block registration if we can't verify
+        console.error('Karma API check failed:', error);
       throw ApiError.serverError(
         'Unable to verify your information at this time. Please try again later.'
       );
     }
 
-    // 3. Hash password
     const hashedPassword = await UserModel.hashPassword(userData.password);
 
-    // 3. Fix: Everything that touches DB must be inside the transaction!
+    // transaction to ensure both user and wallet are created atomically. We can't have a user without a wallet or vice versa.
     return await db.transaction(async (trx) => {
         try {
-        // Create user inside transaction
         const user = await UserModel.create({ ...userData, password: hashedPassword, is_blacklisted: false }, trx);
 
-        // Create wallet inside same transaction
         const wallet = await WalletModel.create(
             { user_id: user.id, balance: 0, currency: 'NGN' },
             trx
         );
 
-        // Generate token (safe outside trx — no DB write)
         const token = TokenService.generateToken({
             userId: user.id,
             email: user.email,
         });
 
-        // Commit happens automatically at end of async function
+        console.log('User registration successful:', user.email);
+
         return {
             user: {
             id: user.id,
@@ -92,8 +87,7 @@ class AuthService {
             token,
         };
         } catch (error) {
-        // Rollback happens automatically on throw
-        console.error('❌ User registration failed:', error);
+        console.error('User registration failed:', error);
         throw error;
         }
     });
@@ -106,25 +100,21 @@ class AuthService {
       throw ApiError.unauthorized('Invalid credentials');
     }
 
-    // Check if user is blacklisted
+    // Also chacking if user is blackisted during login. Just to be super safe
     if (user.is_blacklisted) {
-      console.log('🚫 Blacklisted user attempted login:', user.email);
+      console.log('Blacklisted user attempted login:', user.email);
       throw ApiError.forbidden(
         'Your account has been restricted. Please contact support.'
       );
     }
 
-    // Verify password
-    const isPasswordValid = await UserModel.verifyPassword(
-      loginData.password,
-      user.password
+    const isPasswordValid = await UserModel.verifyPassword(loginData.password, user.password
     );
 
     if (!isPasswordValid) {
       throw ApiError.unauthorized('Invalid credentials');
     }
 
-    // Generate token
     const token = TokenService.generateToken({
       userId: user.id,
       email: user.email,
@@ -148,8 +138,7 @@ class AuthService {
       if (error instanceof ApiError) {
         throw error;
       }
-      // Log but don't block login if Karma API fails
-      console.error('⚠️  Karma check on login failed:', error);
+      console.error('Karma check on login failed:', error);
     }
 
     return {

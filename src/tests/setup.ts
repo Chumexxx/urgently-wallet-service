@@ -1,6 +1,5 @@
 import 'jest'
 
-// Set test environment
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-secret-key';
 process.env.DB_NAME = 'wallet_service_test';
@@ -21,5 +20,5 @@ global.console = {
 
 // Clean up after all tests
 afterAll(async () => {
-  // Add any global cleanup here
+  jest.clearAllMocks();
 });

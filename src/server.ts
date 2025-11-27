@@ -2,12 +2,11 @@ import app from './app';
 import db from './config/database';
 import 'dotenv/config'; 
 
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 2000;
 
-// Graceful shutdown handlers
 const gracefulShutdown = (signal: string) => {
   console.log(`\nReceived ${signal} — Shutting down gracefully...`);
-  db.destroy() // ← Properly close DB connections
+  db.destroy()
     .then(() => {
       console.log('Database connections closed.');
       process.exit(0);
@@ -19,9 +18,8 @@ const gracefulShutdown = (signal: string) => {
 };
 
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT')); // Ctrl+C
+process.on('SIGINT', () => gracefulShutdown('SIGINT')); 
 
-// Test database connection
 async function startServer() {
   try {
     await db.raw('SELECT 1 + 1 AS result');
@@ -30,7 +28,6 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`Press Ctrl+C to stop`);
     });
   } catch (error) {
     console.error('Failed to connect to database:', error);
@@ -38,7 +35,6 @@ async function startServer() {
   }
 }
 
-// Handle unhandled rejections & exceptions
 process.on('unhandledRejection', (reason) => {
   console.error('Unhandled Promise Rejection:', reason);
   gracefulShutdown('unhandledRejection');
@@ -49,5 +45,4 @@ process.on('uncaughtException', (error) => {
   gracefulShutdown('uncaughtException');
 });
 
-// Start the server
 startServer();

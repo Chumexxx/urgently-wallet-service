@@ -4,11 +4,7 @@ import { ApiResponse } from '../utils/apiResponse';
 import { CreateUserDto, LoginDto } from '../types';
 
 class AuthController {
-  /**
-   * @desc    Register a new user
-   * @route   POST /api/v1/auth/register
-   * @access  Public
-   */
+  /*Controller for user registeration. This controller makes use of the register service in the service folder*/
   async register(req: Request, res: Response, next: NextFunction) {
     try {
       const userData: CreateUserDto = req.body;
@@ -22,11 +18,7 @@ class AuthController {
     }
   }
 
-  /**
-   * @desc    Login user
-   * @route   POST /api/v1/auth/login
-   * @access  Public
-   */
+  /*Controller for user login. This controller makes use of the login service in the service folder*/
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const loginData: LoginDto = req.body;
