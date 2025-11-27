@@ -3,7 +3,6 @@ import UserModel from '../../models/userModel';
 import WalletModel from '../../models/walletModel';
 import TokenService from '../../utils/generateWebToken';
 import db from '../../config/database';
-import { ApiError } from '../../utils/apiError';
 import KarmaService from '../../services/karmaService';
 
 jest.mock('../../models/userModel');

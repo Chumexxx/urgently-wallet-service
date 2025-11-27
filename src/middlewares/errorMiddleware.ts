@@ -75,6 +75,13 @@ export const notFoundHandler = (req: Request, res: Response) => {
 
 export const asyncHandler = (fn: Function) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+    try {
+      const result = fn(req, res, next);
+      // In case fn returns a promise, ensure rejections are passed to next
+      return Promise.resolve(result).catch(next);
+    } catch (err) {
+      // Handle synchronous errors
+      return next(err as Error);
+    }
   };
 };
