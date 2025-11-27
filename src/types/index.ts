@@ -69,11 +69,34 @@ export interface JwtPayload {
   email: string;
 }
 
+export interface KarmaCheckResult {
+  identity: string;
+  is_blacklisted: boolean;
+  reason?: string;
+  error?: string;
+}
+
 export interface KarmaCheckResponse {
   status: string;
   message: string;
   data?: {
     karma_identity: string;
-    reports?: any[];
+    amount_in_contention?: string;
+    reason?: string | null;
+    default_date?: string;
+    karma_type?: {
+      karma: string;
+    };
+    karma_identity_type?: {
+      identity_type: string;
+    };
+    reporting_entity?: {
+      name: string;
+      email: string;
+    };
+  };
+  meta?: {
+    cost: number;
+    balance: number;
   };
 }
