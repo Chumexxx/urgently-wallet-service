@@ -8,6 +8,7 @@
     "dev:debug": "tsx watch --inspect src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "postinstall": "npm run build", 
     "knex": "knex --knexfile knexfile.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch",

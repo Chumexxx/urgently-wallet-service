@@ -431,7 +431,7 @@ Tests cover:
 ✅ Input validation
 
 Project Structure
-wallet-service/
+urgently-wallet-service/
 ├── src/
 │   ├── config/
 │   │   ├── database.ts          # Knex database configuration
