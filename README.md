@@ -39,54 +39,9 @@ Password Hashing: bcryptjs
 
 Database Design
 Entity-Relationship Diagram
-┌─────────────────────────┐
-│        USERS            │
-├─────────────────────────┤
-│ PK  id (UUID)           │
-│     email (UNIQUE)      │
-│     password            │
-│     first_name          │
-│     last_name           │
-│     phone (UNIQUE)      │
-│     is_blacklisted      │
-│     created_at          │
-│     updated_at          │
-└────────────┬────────────┘
-             │
-             │ 1:1
-             │
-┌────────────▼────────────┐
-│       WALLETS           │
-├─────────────────────────┤
-│ PK  id (UUID)           │
-│ FK  user_id → USERS.id  │
-│     balance (DECIMAL)   │
-│     currency (NGN)      │
-│     created_at          │
-│     updated_at          │
-└────────────┬────────────┘
-             │
-             │ 1:N
-             │
-┌────────────▼────────────────────────┐
-│         TRANSACTIONS                │
-├─────────────────────────────────────┤
-│ PK  id (UUID)                       │
-│ FK  wallet_id → WALLETS.id          │
-│     type (credit/debit)             │
-│     category (funding/transfer/     │
-│              withdrawal)            │
-│     amount (DECIMAL)                │
-│     balance_before (DECIMAL)        │
-│     balance_after (DECIMAL)         │
-│     reference (UNIQUE)              │
-│     description                     │
-│ FK  recipient_wallet_id (NULLABLE)  │
-│     status (pending/success/failed) │
-│     metadata (JSON)                 │
-│     created_at                      │
-│     updated_at                      │
-└─────────────────────────────────────┘
+
+<img width="826" height="607" alt="wallet-service-E-R Diagram" src="https://github.com/user-attachments/assets/17483139-f03b-4427-ae13-07dbb3a38e09" />
+
 Database Relationships
 
 Users → Wallets (One-to-One)
