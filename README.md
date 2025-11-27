@@ -1,9 +1,12 @@
-Urgently Wallet Service MVP
+```markdown
+# Urgently Wallet Service MVP
+
+# Project Overview
 A secure and scalable wallet service API built with Node.js, TypeScript, KnexJS ORM, and MySQL. Users can create accounts, fund wallets, transfer funds, and withdraw money with built-in Lendsqr Adjutor Karma blacklist verification.
 
 Table of Contents
 
-Features
+# Features
 Tech Stack
 Database Design
 Getting Started
@@ -12,7 +15,7 @@ Testing
 Project Structure
 Design Decisions
 
-Features
+### Features
 
 ✅ User registration with blacklist verification
 ✅ Faux token-based authentication (JWT)
@@ -25,7 +28,7 @@ Features
 ✅ Comprehensive unit tests
 ✅ Lendsqr Adjutor Karma blacklist integration
 
-Tech Stack
+# Tech Stack
 
 Runtime: Node.js (LTS v18+)
 Language: TypeScript
@@ -37,56 +40,11 @@ Validation: Joi
 Testing: Jest, Supertest
 Password Hashing: bcryptjs
 
-Database Design
+### Database Design
 Entity-Relationship Diagram
-┌─────────────────────────┐
-│        USERS            │
-├─────────────────────────┤
-│ PK  id (UUID)           │
-│     email (UNIQUE)      │
-│     password            │
-│     first_name          │
-│     last_name           │
-│     phone (UNIQUE)      │
-│     is_blacklisted      │
-│     created_at          │
-│     updated_at          │
-└────────────┬────────────┘
-             │
-             │ 1:1
-             │
-┌────────────▼────────────┐
-│       WALLETS           │
-├─────────────────────────┤
-│ PK  id (UUID)           │
-│ FK  user_id → USERS.id  │
-│     balance (DECIMAL)   │
-│     currency (NGN)      │
-│     created_at          │
-│     updated_at          │
-└────────────┬────────────┘
-             │
-             │ 1:N
-             │
-┌────────────▼────────────────────────┐
-│         TRANSACTIONS                │
-├─────────────────────────────────────┤
-│ PK  id (UUID)                       │
-│ FK  wallet_id → WALLETS.id          │
-│     type (credit/debit)             │
-│     category (funding/transfer/     │
-│              withdrawal)            │
-│     amount (DECIMAL)                │
-│     balance_before (DECIMAL)        │
-│     balance_after (DECIMAL)         │
-│     reference (UNIQUE)              │
-│     description                     │
-│ FK  recipient_wallet_id (NULLABLE)  │
-│     status (pending/success/failed) │
-│     metadata (JSON)                 │
-│     created_at                      │
-│     updated_at                      │
-└─────────────────────────────────────┘
+
+<img width="826" height="607" alt="wallet-service-E-R Diagram" src="https://github.com/user-attachments/assets/17483139-f03b-4427-ae13-07dbb3a38e09" />
+
 Database Relationships
 
 Users → Wallets (One-to-One)
@@ -103,8 +61,9 @@ Transactions track all wallet activities
 CASCADE delete: Deleting a wallet deletes all its transactions
 
 
-Getting Started
-Prerequisites
+### Getting Started
+
+### Prerequisites
 
 Node.js v18+ LTS
 MySQL 8.0+
@@ -114,19 +73,21 @@ Installation
 
 Clone the repository
 
-bashgit clone <https://github.com/Chumexxx/urgently-wallet-service.git>
+```bash
+git clone <https://github.com/Chumexxx/urgently-wallet-service.git>
 cd urgently-wallet-service
 
-Install dependencies
+# Install dependencies
 
-bashnpm install
+```bash
+npm install
 
-Setup MySQL Database
+# Setup MySQL Database
 
 sqlCREATE DATABASE wallet_service;
 CREATE DATABASE wallet_service_test;
 
-Configure environment variables
+# Configure environment variables
 
 Create a .env file in the root directory:
 env# Server
@@ -150,15 +111,18 @@ KARMA_API_KEY=your_karma_api_key
 
 Run database migrations
 
-bashnpx knex migrate:latest
+```bash
+npx knex migrate:latest
 or
 npm run knex migrate:latest
 
 Start the development server
 
-bashnpm run dev
+```bash
+npm run dev
 The server will start on http://localhost:2000
-Lendsqr Adjutor Karma Setup
+
+## Lendsqr Adjutor Karma Setup
 
 Visit Lendsqr Adjutor
 Sign up for an account
@@ -171,7 +135,7 @@ http://localhost:2000/api/v1
 Authentication
 All wallet endpoints require authentication. Include the JWT token in the Authorization header:
 Authorization: Bearer <your_jwt_token>
-Endpoints
+# Endpoints
 1. Register User
 POST /auth/register
 Creates a new user account and wallet. Verifies against Lendsqr Karma blacklist.
