@@ -35,7 +35,7 @@ class AuthService {
         });
 
         if (karmaCheck.isBlacklisted) {
-            console.log('🚫 User is blacklisted:', karmaCheck.reasons);
+            console.log('User is blacklisted:', karmaCheck.reasons);
             
             throw ApiError.forbidden(
             'You cannot be onboarded due to blacklist records. ' +

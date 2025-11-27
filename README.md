@@ -390,6 +390,7 @@ json{
         ],
         "recent_transactions_count": 4
     },
+}
 Error Responses
 All errors follow this format:
 json{

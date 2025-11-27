@@ -134,17 +134,27 @@ class KarmaService {
     email: string;
     phone: string;
   }): Promise<{ isBlacklisted: boolean; reasons: string[] }> {
-    const results = await this.checkMultipleIdentities(identities);
-    
-    const blacklistedResults = results.filter(result => result.is_blacklisted);
+    let results: KarmaCheckResult[];
+
+    try {
+      results = await this.checkMultipleIdentities(identities);
+    } catch (error) {
+      console.error('Karma service unavailable or failed critically:', error);
+      throw new Error(
+        'Identity verification service is currently unavailable. Please try again later.'
+      );
+    }
+
+    const blacklistedResults = results.filter(r => r.is_blacklisted);
     const reasons = blacklistedResults
-      .map(result => `${result.identity}: ${result.reason}`)
+      .map(r => `${r.identity}: ${r.reason || 'Blacklisted'}`)
       .filter(Boolean);
 
-    return {
-      isBlacklisted: blacklistedResults.length > 0,
-      reasons,
-    };
+    if (blacklistedResults.length > 0) {
+      return { isBlacklisted: true, reasons };
+    }
+
+    return { isBlacklisted: false, reasons: [] };
   }
 }
 
