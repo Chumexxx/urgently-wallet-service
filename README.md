@@ -42,9 +42,12 @@ Password Hashing: bcryptjs
 
 ### Database Design
 Entity-Relationship Diagram
-
+```
 <img width="826" height="607" alt="wallet-service-E-R Diagram" src="https://github.com/user-attachments/assets/17483139-f03b-4427-ae13-07dbb3a38e09" />
 
+
+
+```markdown
 Database Relationships
 
 Users → Wallets (One-to-One)
@@ -597,3 +600,4 @@ Acknowledgments
 
 Lendsqr for the Adjutor Karma API
 The Node.js and TypeScript communities
+```
