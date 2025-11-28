@@ -1,4 +1,4 @@
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { JwtPayload } from '../types';
 import { ApiError } from './apiError';
 import dotenv from 'dotenv';

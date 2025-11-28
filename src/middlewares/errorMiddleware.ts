@@ -1,15 +1,22 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../utils/apiError';
+import logger from '../utils/logger';
 
-/**
- * Global error handler middleware
- */
 export const errorHandler = (
   err: Error | ApiError,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+
+  logger.error({
+    err,
+    req: {
+      method: req.method,
+      url: req.url,
+      headers: req.headers,
+    },
+  }, 'Request error occurred');
  
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({

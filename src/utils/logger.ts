@@ -12,7 +12,7 @@ let logger: pino.Logger;
 if (process.env.NODE_ENV !== 'production') {
   const streams: pino.StreamEntry[] = [
     {
-      level: 'info',
+      level: 'trace',
       stream: pino.transport({
         target: 'pino-pretty',
         options: {

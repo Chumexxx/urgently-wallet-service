@@ -6,14 +6,11 @@ import {asyncHandler} from '../middlewares/errorMiddleware'
 
 const router = Router();
 
-/**
- * @route   POST /api/v1/auth/register
-*/
+
+// POST /api/v1/auth/register
 router.post('/register', validate(registerSchema), asyncHandler(AuthController.register));
 
-/**
- * @route   POST /api/v1/auth/login
- */
+// POST /api/v1/auth/login
 router.post('/login', validate(loginSchema), asyncHandler(AuthController.login));
 
 export default router;

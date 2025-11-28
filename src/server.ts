@@ -1,6 +1,7 @@
 import app from './app';
 import db from './config/database';
 import 'dotenv/config'; 
+import logger from './utils/logger';
 
 const PORT = Number(process.env.PORT) || 2000;
 
@@ -12,6 +13,7 @@ const gracefulShutdown = (signal: string) => {
       process.exit(0);
     })
     .catch((err) => {
+      logger.error({ err }, 'Error during shutdown');
       console.error('Error during shutdown:', err);
       process.exit(1);
     });
@@ -26,22 +28,29 @@ async function startServer() {
     console.log('Database connected successfully');
 
     app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Server is running on http://localhost:${PORT}`);;
+      } else {
+        console.log('Running in production mode: https://chukwuemeka-obasi-lendsqr-be-test.onrender.com');
+      }
+      console.log(`Environment: ${process.env.NODE_ENV}`);
     });
   } catch (error) {
+    logger.fatal({ err: error }, 'Failed to connect to database');
     console.error('Failed to connect to database:', error);
     process.exit(1);
   }
 }
 
-process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Promise Rejection:', reason);
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Promise Rejection:', reason, promise);
+  logger.error({ err: reason, promise}, 'Unhandled promise rejection');
   gracefulShutdown('unhandledRejection');
 });
 
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
+  logger.fatal({ err: error }, 'Uncaught exception');
   gracefulShutdown('uncaughtException');
 });
 

@@ -11,7 +11,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string('reference', 64).notNullable().alter({ alterType: true });
   });
 
-  // Step 3: Re-add the unique constraint (now on VARCHAR(50))
+  // Step 3: Re-add the unique constraint (now on VARCHAR(64))
   await knex.schema.alterTable('transactions', (table) => {
     table.unique('reference');
   });

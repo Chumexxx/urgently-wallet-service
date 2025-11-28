@@ -4,7 +4,7 @@ import WalletService from '../services/walletService';
 import { ApiResponse } from '../utils/apiResponse';
 import { FundWalletDto, TransferDto, WithdrawDto } from '../types';
 
-/*The core functionality of this web service is the wallet. This controller communicates to the services which communicate with the model and the database to create transaction and perform other functions in the user's wallet*/
+/*The core functionality of this web service is the wallet. This controller communicates with the services which communicates with the model and the database to create transaction and perform other functions in the user's wallet*/
 class WalletController {
   async getBalance(req: AuthRequest, res: Response, next: NextFunction) {
     try {

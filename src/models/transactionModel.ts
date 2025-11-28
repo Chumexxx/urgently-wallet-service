@@ -11,7 +11,7 @@ class TransactionModel {
     trx?: Knex.Transaction
   ): Promise<ITransaction> {
     const connection = trx || db;
-    //using uuid for id generation because of type errors from typescript
+  
     const id = uuidv4();
     
     const reference = `TXN-${uuidv4()}`;

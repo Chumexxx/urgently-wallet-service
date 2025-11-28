@@ -4,6 +4,7 @@ import UserModel from '../models/userModel';
 import TransactionModel from '../models/transactionModel';
 import { ApiError } from '../utils/apiError';
 import db from '../config/database';
+import logger from '../utils/logger';
 
 class WalletService {
   async getWalletBalance(userId: string) {
@@ -55,6 +56,8 @@ class WalletService {
 
       await trx.commit();
 
+      logger.info({ userId, amount: data.amount }, 'Wallet funded successfully');
+
       return {
         message: 'Wallet funded successfully',
         transaction: {
@@ -67,6 +70,8 @@ class WalletService {
       };
     } catch (error) {
       await trx.rollback();
+
+      logger.error({ err: error, userId, amount: data.amount }, 'Fund wallet error');
       console.error('Fund wallet error:', error);
       throw error;
     }
@@ -143,8 +148,8 @@ class WalletService {
         },
         trx
       );
-
       await trx.commit();
+            logger.info({ from: userId, to: recipient.id, amount: data.amount },'Transfer successful');
 
       return {
         message: 'Transfer successful',
@@ -161,6 +166,7 @@ class WalletService {
     } catch (error) {
       await trx.rollback();
       console.error('Transfer error:', error);
+      logger.error({ err: error, from: userId, to: data.recipient_email, amount: data.amount }, 'Transfer error');
       throw error;
     }
   }
@@ -204,6 +210,7 @@ class WalletService {
 
       // Commit transaction
       await trx.commit();
+      logger.info({ userId, amount: data.amount }, 'Withdrawal successful');
 
       return {
         message: 'Withdrawal successful',
@@ -219,6 +226,7 @@ class WalletService {
       // Rollback on error
       await trx.rollback();
       console.error('Withdrawal error:', error);
+      logger.error({ err: error, userId, amount: data.amount }, 'Withdrawal error');
       throw error;
     }
   }

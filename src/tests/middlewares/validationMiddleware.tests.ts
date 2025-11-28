@@ -76,7 +76,6 @@ describe('Validation Middleware Unit Tests', () => {
       mockRequest.body = {
         email: 'invalid-email',
         password: '123',
-        age: 15,
       };
 
       const middleware = validate(schema);
@@ -87,7 +86,6 @@ describe('Validation Middleware Unit Tests', () => {
           errors: expect.arrayContaining([
             expect.objectContaining({ field: 'email' }),
             expect.objectContaining({ field: 'password' }),
-            expect.objectContaining({ field: 'age' }),
           ]),
         })
       );

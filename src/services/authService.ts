@@ -5,6 +5,7 @@ import KarmaService from './karmaService';
 import { ApiError } from '../utils/apiError';
 import db from '../config/database';
 import TokenService from '../utils/generateWebToken';
+import logger from '../utils/logger';
 
 class AuthService {
   private jwtSecret: string;
@@ -26,7 +27,8 @@ class AuthService {
     }
 
     //this is where we start to check karma blacklist
-    console.log('🔍 Checking Karma blacklist for new user...');
+    console.log('Checking Karma blacklist for new user...');
+    logger.info('Initiating Karma blacklist check for new user');
 
     try {
         const karmaCheck = await KarmaService.isAnyIdentityBlacklisted({
@@ -35,6 +37,7 @@ class AuthService {
         });
 
         if (karmaCheck.isBlacklisted) {
+            logger.warn('Karma blacklist check failed for new user');
             console.log('User is blacklisted:', karmaCheck.reasons);
             
             throw ApiError.forbidden(
@@ -43,15 +46,16 @@ class AuthService {
           );
         }
 
+        logger.info('Karma blacklist check passed for new user');
         console.log('User passed Karma blacklist check');
         } catch (error) {
         if (error instanceof ApiError) {
-            throw error;
+          throw error;
         }
 
         console.error('Karma API check failed:', error);
-      throw ApiError.serverError(
-        'Unable to verify your information at this time. Please try again later.'
+          throw ApiError.serverError(
+          'Unable to verify your information at this time. Please try again later.'
       );
     }
 
@@ -73,6 +77,7 @@ class AuthService {
         });
 
         console.log('User registration successful:', user.email);
+        logger.info({ userId: user.id, email: user.email }, 'User registered successfully');
 
         return {
             user: {
@@ -87,10 +92,11 @@ class AuthService {
             token,
         };
         } catch (error) {
-        console.error('User registration failed:', error);
-        throw error;
+          console.error('User registration failed:', error);
+          logger.error({ err: error }, 'User registration failed');
+          throw error;
         }
-    });
+    } );
   }
 
   async login(loginData: LoginDto) {
@@ -102,6 +108,7 @@ class AuthService {
 
     // Also chacking if user is blackisted during login. Just to be super safe
     if (user.is_blacklisted) {
+      logger.warn({ userId: user.id, email: user.email }, 'Blacklisted user attempted login');
       console.log('Blacklisted user attempted login:', user.email);
       throw ApiError.forbidden(
         'Your account has been restricted. Please contact support.'
@@ -138,6 +145,7 @@ class AuthService {
       if (error instanceof ApiError) {
         throw error;
       }
+      logger.error({ err: error, userId: user.id }, 'Karma check on login failed');
       console.error('Karma check on login failed:', error);
     }
 

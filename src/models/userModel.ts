@@ -40,8 +40,7 @@ class UserModel {
     return !!user;
   }
 
-  async verifyPassword(plainPassword: string, hashedPassword: string
-  ): Promise<boolean> {
+  async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
     return await bcrypt.compare(plainPassword, hashedPassword);
   }
 

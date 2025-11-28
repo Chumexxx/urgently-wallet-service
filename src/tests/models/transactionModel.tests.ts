@@ -1,7 +1,6 @@
 import TransactionModel from '../../models/transactionModel';
 import db from '../../config/database';
 
-// Proper Knex mock: db('table') returns a query builder
 jest.mock('../../config/database', () => {
   const mockQueryBuilder = {
     insert: jest.fn(),

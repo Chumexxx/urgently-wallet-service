@@ -168,7 +168,6 @@ describe('UserModel Unit Tests', () => {
     });
   });
 
-  // These use real bcrypt — keep them (they pass)
   describe('verifyPassword & hashPassword', () => {
     it('should hash and verify correctly', async () => {
       const password = 'MyStrongPass123!';

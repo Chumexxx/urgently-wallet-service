@@ -1,7 +1,6 @@
 import WalletModel from '../../models/walletModel';
 import db from '../../config/database';
 
-// Correct Knex mock: db('wallets') returns a query builder
 jest.mock('../../config/database', () => {
   const mockQueryBuilder = {
     insert: jest.fn(),
