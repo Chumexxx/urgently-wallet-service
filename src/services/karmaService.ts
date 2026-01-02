@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { KarmaCheckResponse, KarmaCheckResult } from '../types/index.js';
-import logger from '../utils/logger.js';
+import logger from '../utils/logger';
 
 class KarmaService {
   private apiUrl: string;

@@ -95,7 +95,7 @@ CREATE DATABASE wallet_service_test;
 Create a .env file in the root directory:
 env# Server
 NODE_ENV=development
-PORT=3000
+PORT=2000
 
 # Database
 DB_HOST=localhost
@@ -106,7 +106,7 @@ DB_NAME=wallet_service
 
 # JWT
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRES_IN=7d
+JWT_EXPIRES_IN=30m
 
 # Lendsqr Adjutor Karma API
 KARMA_API_URL=https://adjutor.lendsqr.com/v2
