@@ -2,8 +2,10 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
-  testMatch: [ '<rootDir>/src/tests/**/*.tests.ts',
-    '<rootDir>/src/tests/**/*.spec.ts'],
+  testMatch: [
+    '<rootDir>/src/tests/**/*.tests.ts',
+    '<rootDir>/src/tests/**/*.spec.ts'
+  ],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',
@@ -26,9 +28,12 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
   testTimeout: 10000,
   verbose: true,
-
-  extensionsToTreatAsEsm: ['.ts'],
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.test.json'
+    }
+  },
   transformIgnorePatterns: [
-    "node_modules/(?!uuid)/",   
-  ],
+    "node_modules/(?!uuid)/"
+  ]
 };
