@@ -33,7 +33,7 @@ app.get('/', (req: Request, res: Response) => {
     documentation: 'https://docs.google.com/document/d/1jM7TcqnV0pIM3AgqC3tQbJ-vhfEVqS7Kr9GNxQUN-HA/edit?usp=sharing',
     github: 'https://github.com/Chumexxx/urgently-wallet-service',
     endpoints: {
-      health: '/api/v1/health',
+      health: 'GET /health',
       auth: {
         register: 'POST /api/v1/auth/register',
         login: 'POST /api/v1/auth/login'
