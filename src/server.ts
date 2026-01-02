@@ -31,7 +31,7 @@ async function startServer() {
       if (process.env.NODE_ENV === 'development') {
         console.log(`Server is running on http://localhost:${PORT}`);;
       } else {
-        console.log('Running in production mode: https://chukwuemeka-obasi-lendsqr-be-test.onrender.com');
+        console.log('Running in production mode: https://urgently-wallet-service.onrender.com');
       }
       console.log(`Environment: ${process.env.NODE_ENV}`);
     });
