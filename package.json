@@ -8,7 +8,7 @@
     "dev:debug": "tsx watch --inspect src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "postinstall": "npm run build", 
+    "postinstall": "npm run build",
     "knex": "knex --knexfile knexfile.ts",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
@@ -21,25 +21,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
+  "dependencies": {
     "@types/express": "^5.0.5",
-    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.1",
-    "@types/pino-http": "^5.8.4",
-    "@types/supertest": "^6.0.3",
     "@types/uuid": "^10.0.0",
-    "jest": "^30.2.0",
-    "nodemon": "^3.1.11",
-    "supertest": "^7.1.4",
-    "ts-jest": "^29.4.5",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@types/bcrypt": "^6.0.0",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
@@ -51,6 +37,19 @@
     "pino": "^10.1.0",
     "pino-http": "^11.0.0",
     "pino-pretty": "^13.1.2",
+    "typescript": "^5.9.3",
     "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jest": "^30.0.0",
+    "@types/pino-http": "^5.8.4",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6"
   }
 }
